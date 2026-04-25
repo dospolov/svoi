@@ -104,7 +104,7 @@ export default async function EventPage({ params }: PageProps) {
             variant="ghost"
             className="h-8 w-full rounded-full bg-accent-lime px-5 text-xs font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
           >
-            <Link href="/sign-up">Join — {event.price}</Link>
+            <Link href={`/sign-up?next=${encodeURIComponent(`/${id}`)}`}>Join — {event.price}</Link>
           </Button>
         </div>
       </div>

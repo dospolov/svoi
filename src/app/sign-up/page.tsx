@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useQuery } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
@@ -24,8 +24,16 @@ import { api } from "../../../convex/_generated/api"
 
 export default function SignUpPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const viewer = useQuery(api.users.viewer, {})
   const { signIn } = useAuthActions()
+  const nextParam = searchParams.get("next")
+  const isSafeNext = nextParam?.startsWith("/") && !nextParam.startsWith("//")
+  const redirectTo = isSafeNext ? nextParam : "/you"
+  const signInHref =
+    isSafeNext
+      ? `/sign-in?next=${encodeURIComponent(nextParam)}`
+      : "/sign-in"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -38,23 +46,23 @@ export default function SignUpPage() {
   const [submitting, setSubmitting] = useState(false)
 
   if (viewer) {
-    router.replace("/you")
+    router.replace(redirectTo)
     return null
   }
 
   return (
     <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
-      <div className="pointer-events-none absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-10">
-        <div className="pointer-events-auto">
-          <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
-        </div>
-      </div>
       <Card className="bg-surface-1">
         <CardHeader>
-          <CardTitle className="font-serif text-3xl italic leading-none">
-            Sign up
-          </CardTitle>
-          <CardDescription>Create your account.</CardDescription>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <CardTitle className="font-serif text-3xl italic leading-none">
+                Sign up
+              </CardTitle>
+              <CardDescription className="mt-1">Create your account.</CardDescription>
+            </div>
+            <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <Input
@@ -150,7 +158,7 @@ export default function SignUpPage() {
                 formData.set("password", password)
                 formData.set("flow", "signUp")
                 await signIn("password", formData)
-                router.replace("/you")
+                router.replace(redirectTo)
               } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to sign up")
               } finally {
@@ -162,7 +170,7 @@ export default function SignUpPage() {
           </Button>
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/sign-in">
+            <Link className="text-foreground underline underline-offset-4" href={signInHref}>
               Sign in
             </Link>
           </p>

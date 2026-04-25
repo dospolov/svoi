@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useQuery } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
@@ -22,8 +22,16 @@ import { api } from "../../../convex/_generated/api"
 
 export default function SignInPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const viewer = useQuery(api.users.viewer, {})
   const { signIn } = useAuthActions()
+  const nextParam = searchParams.get("next")
+  const isSafeNext = nextParam?.startsWith("/") && !nextParam.startsWith("//")
+  const redirectTo = isSafeNext ? nextParam : "/"
+  const signUpHref =
+    isSafeNext
+      ? `/sign-up?next=${encodeURIComponent(nextParam)}`
+      : "/sign-up"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -31,7 +39,7 @@ export default function SignInPage() {
   const [submitting, setSubmitting] = useState(false)
 
   if (viewer) {
-    router.replace("/you")
+    router.replace(redirectTo)
     return null
   }
 
@@ -82,7 +90,7 @@ export default function SignInPage() {
                 formData.set("password", password)
                 formData.set("flow", "signIn")
                 await signIn("password", formData)
-                router.replace("/you")
+                router.replace(redirectTo)
               } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to sign in")
               } finally {
@@ -94,7 +102,7 @@ export default function SignInPage() {
           </Button>
           <p className="text-sm text-muted-foreground">
             No account?{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/sign-up">
+            <Link className="text-foreground underline underline-offset-4" href={signUpHref}>
               Sign up
             </Link>
           </p>
