@@ -67,6 +67,7 @@ export default function YouPage() {
     }
 
     setName(viewer.name ?? "")
+    setProfession(viewer.profession ?? "")
     setEmail(viewer.email ?? "")
     setDidInitProfileFields(true)
   }, [viewer, didInitProfileFields])
@@ -107,10 +108,13 @@ export default function YouPage() {
 
     setIsSaving(true)
     try {
-      await upsertMyName({ name: nextName })
-      toast.success("Name updated")
+      await upsertMyName({
+        name: nextName,
+        profession: profession.trim(),
+      })
+      toast.success("Profile updated")
     } catch {
-      toast.error("Failed to save name")
+      toast.error("Failed to save profile")
     } finally {
       setIsSaving(false)
     }

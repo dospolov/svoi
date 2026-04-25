@@ -17,12 +17,13 @@ export const viewer = query({
     return {
       ...identity,
       name: profile?.name ?? identity.name,
+      profession: profile?.profession ?? "",
     }
   },
 })
 
 export const upsertMyName = mutation({
-  args: { name: v.string() },
+  args: { name: v.string(), profession: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
@@ -30,6 +31,7 @@ export const upsertMyName = mutation({
     }
 
     const nextName = args.name.trim()
+    const nextProfession = args.profession?.trim() ?? ""
     if (!nextName) {
       throw new Error("Name is required")
     }
@@ -40,13 +42,17 @@ export const upsertMyName = mutation({
       .unique()
 
     if (existing) {
-      await ctx.db.patch(existing._id, { name: nextName })
+      await ctx.db.patch(existing._id, {
+        name: nextName,
+        profession: nextProfession,
+      })
       return existing._id
     }
 
     return await ctx.db.insert("userProfiles", {
       userId: identity.subject,
       name: nextName,
+      profession: nextProfession,
     })
   },
 })
