@@ -71,6 +71,7 @@ export default function YouPage() {
     setCity(viewer.city ?? "")
     setAge(viewer.age ?? "")
     setEmail(viewer.email ?? "")
+    setPassword(viewer.password ?? "")
     setDidInitProfileFields(true)
   }, [viewer, didInitProfileFields])
 
@@ -127,11 +128,6 @@ export default function YouPage() {
       toast.error("Email is required")
       return
     }
-    if (!nextPassword) {
-      toast.error("Password is required")
-      return
-    }
-
     setIsSaving(true)
     try {
       await upsertMyName({
@@ -139,6 +135,8 @@ export default function YouPage() {
         profession: profession.trim(),
         city: nextCity,
         age: nextAge,
+        email: nextEmail,
+        password: nextPassword || undefined,
       })
       toast.success("Profile updated")
     } catch {
@@ -274,9 +272,8 @@ export default function YouPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter a new password"
+              placeholder="Enter a new password (optional)"
               autoComplete="new-password"
-              required
             />
           </div>
 

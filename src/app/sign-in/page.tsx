@@ -25,7 +25,10 @@ export default function SignInPage() {
   const viewer = useQuery(api.users.viewer, {})
   const { signIn } = useAuthActions()
   const [nextParam, setNextParam] = useState<string | null>(null)
-  const isSafeNext = nextParam?.startsWith("/") && !nextParam.startsWith("//")
+  const isSafeNext =
+    typeof nextParam === "string" &&
+    nextParam.startsWith("/") &&
+    !nextParam.startsWith("//")
   const redirectTo = isSafeNext ? nextParam : "/"
   const signUpHref =
     isSafeNext

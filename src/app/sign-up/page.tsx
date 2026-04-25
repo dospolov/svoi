@@ -28,7 +28,10 @@ export default function SignUpPage() {
   const { signIn } = useAuthActions()
   const upsertMyName = useMutation(api.users.upsertMyName)
   const [nextParam, setNextParam] = useState<string | null>(null)
-  const isSafeNext = nextParam?.startsWith("/") && !nextParam.startsWith("//")
+  const isSafeNext =
+    typeof nextParam === "string" &&
+    nextParam.startsWith("/") &&
+    !nextParam.startsWith("//")
   const redirectTo = isSafeNext ? nextParam : "/you"
   const signInHref =
     isSafeNext
@@ -126,6 +129,7 @@ export default function SignUpPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            required
           />
           <Input
             type="password"
@@ -148,6 +152,10 @@ export default function SignUpPage() {
                 setError("Please fill in all required fields.")
                 return
               }
+              if (!email.trim()) {
+                setError("Email is required.")
+                return
+              }
 
               if (!Number.isInteger(Number(age)) || Number(age) < 1) {
                 setError("Please enter a valid age.")
@@ -157,12 +165,20 @@ export default function SignUpPage() {
               setSubmitting(true)
               setError(null)
               try {
+                const nextPassword = password.trim()
+                const authPassword = nextPassword || crypto.randomUUID()
                 const formData = new FormData()
-                formData.set("email", email)
-                formData.set("password", password)
+                formData.set("email", email.trim())
+                formData.set("password", authPassword)
                 formData.set("flow", "signUp")
                 await signIn("password", formData)
-                await upsertMyName({ name: name.trim() })
+                await upsertMyName({
+                  name: name.trim(),
+                  city: city.trim(),
+                  age: age.trim(),
+                  email: email.trim(),
+                  password: nextPassword || undefined,
+                })
                 router.replace(redirectTo)
               } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to sign up")
