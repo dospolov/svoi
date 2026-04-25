@@ -7,6 +7,7 @@ import { categoryColor, gradientClass } from "@/lib/events"
 import type { Attendee } from "@/lib/events"
 import { AvatarStack } from "@/components/Avatar"
 import { EventDateFilterToggle } from "@/components/EventDateFilterToggle"
+import { EventDateSortToggle } from "@/components/EventDateSortToggle"
 import { EventSearchToggle } from "@/components/EventSearchToggle"
 
 type EventItem = {
@@ -28,6 +29,19 @@ type EventItem = {
   gradient?: string
 }
 
+/** Matches static event copy (e.g. APR 26 · 6:30 AM) for listing year. */
+const EVENT_LISTING_YEAR = 2026
+
+function getEventSortKey(event: EventItem): number {
+  const date = event.date?.trim()
+  const time = event.time?.trim() ?? "12:00 AM"
+  if (!date) {
+    return 0
+  }
+  const parsed = Date.parse(`${date}, ${EVENT_LISTING_YEAR} ${time}`)
+  return Number.isNaN(parsed) ? 0 : parsed
+}
+
 type FeedEventsSectionProps = {
   events: unknown[]
 }
@@ -35,6 +49,7 @@ type FeedEventsSectionProps = {
 export function FeedEventsSection({ events }: FeedEventsSectionProps) {
   const [query, setQuery] = useState("")
   const [selectedDates, setSelectedDates] = useState<Date[]>([])
+  const [dateSortDescending, setDateSortDescending] = useState(false)
   const typedEvents = events as EventItem[]
 
   const selectedDateLabels = useMemo(() => {
@@ -67,15 +82,30 @@ export function FeedEventsSection({ events }: FeedEventsSectionProps) {
     })
   }, [typedEvents, query, selectedDateLabels])
 
+  const displayedEvents = useMemo(() => {
+    const copy = [...filteredEvents]
+    copy.sort((a, b) => {
+      const ka = getEventSortKey(a)
+      const kb = getEventSortKey(b)
+      const primary = dateSortDescending ? kb - ka : ka - kb
+      if (primary !== 0) {
+        return primary
+      }
+      return String(a.slug).localeCompare(String(b.slug))
+    })
+    return copy
+  }, [filteredEvents, dateSortDescending])
+
   const isSearchActive = query.trim().length >= 2
   const isDateFilterActive = selectedDateLabels.size > 0
-  const hasNoResults = (isSearchActive || isDateFilterActive) && filteredEvents.length === 0
+  const hasNoResults = (isSearchActive || isDateFilterActive) && displayedEvents.length === 0
 
   return (
     <>
       <header className="px-6">
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
           <EventDateFilterToggle value={selectedDates} onChange={setSelectedDates} />
+          <EventDateSortToggle descending={dateSortDescending} onChange={setDateSortDescending} />
           <EventSearchToggle value={query} onChange={setQuery} />
         </div>
       </header>
@@ -91,7 +121,7 @@ export function FeedEventsSection({ events }: FeedEventsSectionProps) {
         </div>
       ) : (
       <ul className="mt-3 space-y-3">
-        {filteredEvents.map((event) => (
+        {displayedEvents.map((event) => (
           <li key={event._id} className="px-6">
             {(() => {
               const hasPreview = !!(
