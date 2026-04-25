@@ -9,6 +9,8 @@ import { useQuery } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Card,
   CardContent,
@@ -73,14 +75,24 @@ export default function SignUpPage() {
             autoComplete="country-name"
             required
           />
-          <Input
-            type="text"
-            placeholder="Gender"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            autoComplete="sex"
-            required
-          />
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Gender</p>
+            <RadioGroup
+              value={gender}
+              onValueChange={setGender}
+              className="flex items-center gap-6 rounded-md border border-input px-3 py-2"
+              aria-required="true"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem id="gender-male" value="male" />
+                <Label htmlFor="gender-male">male</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem id="gender-female" value="female" />
+                <Label htmlFor="gender-female">female</Label>
+              </div>
+            </RadioGroup>
+          </div>
           <Input
             type="number"
             placeholder="Age"
