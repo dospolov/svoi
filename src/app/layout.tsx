@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "./Header"
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
+import ConvexClientProvider from "./ConvexClientProvider"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -39,8 +40,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <ConvexAuthNextjsServerProvider>
-            <Header />
-            {children}
+            <ConvexClientProvider>
+              <Header />
+              {children}
+            </ConvexClientProvider>
           </ConvexAuthNextjsServerProvider>
         </ThemeProvider>
       </body>
