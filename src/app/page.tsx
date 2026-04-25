@@ -4,6 +4,7 @@ import { AvatarStack } from "@/components/Avatar"
 import { BottomNav } from "@/components/BottomNav"
 import Link from "next/link"
 import { api, getConvexClient } from "@/lib/convex"
+import { Button } from "@/components/ui/button"
 
 const tabs = ["Near me", "This week", "New", "Most going"] as const;
 
@@ -24,21 +25,22 @@ export default async function FeedPage() {
               <span className="text-accent-lime italic">tonight?</span>
             </h1>
           </div>
-          <button
+          <Button
             type="button"
             aria-label="Add event"
             className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-lime text-primary-foreground transition-transform hover:scale-105 active:scale-95"
           >
             <Plus className="h-5 w-5" strokeWidth={2.5} />
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
         <div className="mt-8 flex gap-6 overflow-x-auto pb-1">
           {tabs.map((t, i) => (
-            <button
+            <Button
               key={t}
               type="button"
+              variant="ghost"
               className={`text-mono-label whitespace-nowrap pb-2 transition-colors ${
                 i === 0
                   ? "border-b-2 border-accent-lime text-accent-lime"
@@ -46,7 +48,7 @@ export default async function FeedPage() {
               }`}
             >
               {t}
-            </button>
+            </Button>
           ))}
         </div>
       </header>

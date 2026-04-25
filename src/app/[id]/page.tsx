@@ -5,6 +5,7 @@ import { categoryColor, gradientClass } from "@/lib/events"
 import { AvatarStack } from "@/components/Avatar"
 import { BottomNav } from "@/components/BottomNav"
 import { api, getConvexClient } from "@/lib/convex"
+import { Button } from "@/components/ui/button"
 
 type PageProps = {
   params: Promise<{
@@ -41,13 +42,14 @@ export default async function EventPage({ params }: PageProps) {
           </Link>
           <h1 className="font-serif text-4xl italic leading-none">Svoi</h1>
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
               aria-label="Search"
+              variant="ghost"
               className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-1 text-foreground/80"
             >
               <Search className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
         <p className="text-mono-label mt-3 text-muted-foreground">
@@ -57,9 +59,10 @@ export default async function EventPage({ params }: PageProps) {
         {/* Chips */}
         <div className="-mx-6 mt-6 flex gap-2 overflow-x-auto px-6 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {chips.map((c, i) => (
-            <button
+            <Button
               key={c}
               type="button"
+              variant="ghost"
               className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                 i === 0
                   ? "border-foreground bg-foreground text-background"
@@ -67,7 +70,7 @@ export default async function EventPage({ params }: PageProps) {
               }`}
             >
               {c}
-            </button>
+            </Button>
           ))}
         </div>
       </header>
@@ -86,13 +89,14 @@ export default async function EventPage({ params }: PageProps) {
                 {String(event.category).slice(1)}
               </span>
             </div>
-            <button
+            <Button
               type="button"
               aria-label="Save"
+              variant="ghost"
               className="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-foreground backdrop-blur-md"
             >
               <Bookmark className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
 
           {/* Bottom info */}
@@ -126,19 +130,21 @@ export default async function EventPage({ params }: PageProps) {
           {event.description}
         </p>
         <div className="mt-5 flex gap-3">
-          <button
+          <Button
             type="button"
+            variant="ghost"
             className="flex-1 rounded-full bg-accent-lime py-4 text-base font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
           >
             Join — {event.price}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             aria-label="Save"
+            variant="outline"
             className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-surface-1 text-foreground"
           >
             <Bookmark className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
       </section>
 
