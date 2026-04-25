@@ -8,6 +8,8 @@ export default defineSchema({
     userId: v.string(),
     name: v.string(),
     profession: v.optional(v.string()),
+    city: v.optional(v.string()),
+    age: v.optional(v.string()),
   }).index("by_user_id", ["userId"]),
   events: defineTable({
     // Existing `src/lib/events.ts` uses `id` as the route slug (e.g. /sunrise-run-club).

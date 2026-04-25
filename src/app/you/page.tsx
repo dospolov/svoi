@@ -68,6 +68,8 @@ export default function YouPage() {
 
     setName(viewer.name ?? "")
     setProfession(viewer.profession ?? "")
+    setCity(viewer.city ?? "")
+    setAge(viewer.age ?? "")
     setEmail(viewer.email ?? "")
     setDidInitProfileFields(true)
   }, [viewer, didInitProfileFields])
@@ -101,8 +103,32 @@ export default function YouPage() {
 
   const handleSaveChanges = async () => {
     const nextName = name.trim()
+    const nextCity = city.trim()
+    const nextAge = age.trim()
+    const nextEmail = email.trim()
+    const nextPassword = password.trim()
     if (!nextName) {
       toast.error("Name is required")
+      return
+    }
+    if (!nextCity) {
+      toast.error("City is required")
+      return
+    }
+    if (!nextAge) {
+      toast.error("Age is required")
+      return
+    }
+    if (!Number.isInteger(Number(nextAge)) || Number(nextAge) < 1) {
+      toast.error("Please enter a valid age")
+      return
+    }
+    if (!nextEmail) {
+      toast.error("Email is required")
+      return
+    }
+    if (!nextPassword) {
+      toast.error("Password is required")
       return
     }
 
@@ -111,6 +137,8 @@ export default function YouPage() {
       await upsertMyName({
         name: nextName,
         profession: profession.trim(),
+        city: nextCity,
+        age: nextAge,
       })
       toast.success("Profile updated")
     } catch {
@@ -184,6 +212,7 @@ export default function YouPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder={viewer?.name ?? "Enter your name"}
               autoComplete="name"
+              required
             />
           </div>
 
@@ -206,6 +235,7 @@ export default function YouPage() {
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Warsaw"
                 autoComplete="address-level2"
+                required
               />
             </div>
 
@@ -219,6 +249,7 @@ export default function YouPage() {
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 placeholder="25"
+                required
               />
             </div>
           </div>
@@ -232,6 +263,7 @@ export default function YouPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               autoComplete="email"
+              required
             />
           </div>
 
@@ -244,6 +276,7 @@ export default function YouPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter a new password"
               autoComplete="new-password"
+              required
             />
           </div>
 
