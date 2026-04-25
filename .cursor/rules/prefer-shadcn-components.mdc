@@ -1,0 +1,11 @@
+---
+description: Prefer shadcn components for UI work
+alwaysApply: true
+---
+
+# Prefer shadcn UI components
+
+- For UI implementation, prefer existing components from `shadcn/ui` first.
+- Before creating a new custom UI component, check whether an equivalent `shadcn` component exists and can be adapted.
+- Reuse project wrapper components built on top of `shadcn` when available.
+- Build custom components only when `shadcn` does not cover the requirement or when product-specific behavior is needed.
