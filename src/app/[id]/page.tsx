@@ -4,6 +4,7 @@ import { Bookmark, ChevronLeft, MapPin, Search } from "lucide-react"
 import { categoryColor, gradientClass } from "@/lib/events"
 import { AvatarStack } from "@/components/Avatar"
 import { BottomNav } from "@/components/BottomNav"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { api, getConvexClient } from "@/lib/convex"
 import { Button } from "@/components/ui/button"
 
@@ -41,7 +42,8 @@ export default async function EventPage({ params }: PageProps) {
             <ChevronLeft className="h-6 w-6" />
           </Link>
           <h1 className="font-serif text-4xl italic leading-none">Svoi</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-surface-1 shadow-none" />
             <Button
               type="button"
               aria-label="Search"

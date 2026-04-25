@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,13 +17,24 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
+function ThemeCorner() {
+  return (
+    <div className="pointer-events-none absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-10">
+      <div className="pointer-events-auto">
+        <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
+      </div>
+    </div>
+  )
+}
+
 export default function YouPage() {
   const viewer = useQuery(api.users.viewer, {})
   const { signOut } = useAuthActions()
 
   if (viewer === undefined) {
     return (
-      <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+      <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+        <ThemeCorner />
         <p className="text-mono-label text-muted-foreground">Loading…</p>
       </div>
     )
@@ -30,7 +42,8 @@ export default function YouPage() {
 
   if (!viewer) {
     return (
-      <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+      <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+        <ThemeCorner />
         <Card className="bg-surface-1">
           <CardHeader>
             <CardTitle className="font-serif text-3xl italic leading-none">
@@ -54,7 +67,8 @@ export default function YouPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+    <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+      <ThemeCorner />
       <Card className="bg-surface-1">
         <CardHeader>
           <CardTitle className="font-serif text-3xl italic leading-none">
