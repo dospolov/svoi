@@ -16,7 +16,7 @@ export default async function FeedPage() {
     <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background pb-32 text-foreground">
       {/* Header */}
       <header className="px-6 pt-12">
-        <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-[linear-gradient(145deg,oklch(0.99_0_0_/_0.72),oklch(0.96_0.01_250_/_0.5)_55%,oklch(0.94_0.02_220_/_0.36))] p-4 shadow-[0_25px_50px_-38px_rgba(16,24,40,0.45)] backdrop-blur-xl dark:border-white/12 dark:bg-[linear-gradient(145deg,oklch(0.2_0.02_250_/_0.65),oklch(0.16_0.02_250_/_0.52)_55%,oklch(0.13_0.01_250_/_0.38))]">
+        <div className="relative overflow-hidden rounded-3xl border border-sky-200/60 bg-[linear-gradient(145deg,oklch(1_0_0_/_0.94),oklch(0.975_0.028_235_/_0.82)_52%,oklch(0.94_0.055_210_/_0.62))] p-4 shadow-[0_26px_58px_-36px_rgba(56,98,141,0.35)] backdrop-blur-xl dark:border-white/12 dark:bg-[linear-gradient(145deg,oklch(0.2_0.02_250_/_0.65),oklch(0.16_0.02_250_/_0.52)_55%,oklch(0.13_0.01_250_/_0.38))]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/45 via-white/15 to-transparent dark:from-white/20 dark:via-white/5"
@@ -82,7 +82,7 @@ export default async function FeedPage() {
               return (
             <Link
               href={`/${event.slug}`}
-              className={`relative block overflow-hidden rounded-3xl border border-white/20 bg-[linear-gradient(150deg,oklch(0.995_0_0_/_0.78),oklch(0.965_0.01_250_/_0.58)_52%,oklch(0.94_0.02_235_/_0.42))] px-4 py-6 shadow-[0_24px_50px_-40px_rgba(15,23,42,0.5)] backdrop-blur-xl transition-all hover:border-white/30 hover:shadow-[0_30px_54px_-40px_rgba(15,23,42,0.55)] active:opacity-70 dark:border-white/12 dark:bg-[linear-gradient(150deg,oklch(0.22_0.02_250_/_0.66),oklch(0.17_0.02_252_/_0.56)_52%,oklch(0.13_0.02_250_/_0.42))] ${cardSizeClass}`}
+              className={`relative block overflow-hidden rounded-3xl border border-sky-200/55 bg-[linear-gradient(150deg,oklch(1_0_0_/_0.93),oklch(0.972_0.022_238_/_0.78)_50%,oklch(0.942_0.045_215_/_0.6))] px-4 py-6 shadow-[0_26px_54px_-38px_rgba(56,98,141,0.34)] backdrop-blur-xl transition-all hover:border-sky-300/70 hover:shadow-[0_32px_58px_-38px_rgba(56,98,141,0.4)] active:opacity-70 dark:border-white/12 dark:bg-[linear-gradient(150deg,oklch(0.22_0.02_250_/_0.66),oklch(0.17_0.02_252_/_0.56)_52%,oklch(0.13_0.02_250_/_0.42))] ${cardSizeClass}`}
             >
               <div
                 aria-hidden
