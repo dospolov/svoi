@@ -30,6 +30,7 @@ export default defineSchema({
     price: v.optional(v.string()),
     distance: v.optional(v.string()),
     description: v.optional(v.string()),
+    interestIds: v.optional(v.array(v.string())),
   })
     .index("by_slug", ["slug"])
     .index("by_category", ["category"])

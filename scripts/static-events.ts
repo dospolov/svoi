@@ -23,6 +23,7 @@ export type StaticEventItem = {
   price: string
   distance: string
   description: string
+  interestIds: string[]
 }
 
 export const staticEvents: StaticEventItem[] = [
@@ -48,6 +49,7 @@ export const staticEvents: StaticEventItem[] = [
     distance: "0.8 MI",
     description:
       "Meet at the park trail for an easy 5k along the waterfront. Coffee and pastries after. All paces welcome — no one runs alone.",
+    interestIds: ["running-community", "coffee-lovers", "chill-chat"],
   },
   {
     id: "backyard-pottery-jam",
@@ -69,6 +71,7 @@ export const staticEvents: StaticEventItem[] = [
     distance: "1.4 MI",
     description:
       "Hand-build a small vase or bowl in a sunny backyard studio. Clay, tools, and firing all included. Beginners absolutely welcome.",
+    interestIds: ["workshops", "modern-art", "creative-writing"],
   },
   {
     id: "tuesday-dinner-long-table",
@@ -91,6 +94,11 @@ export const staticEvents: StaticEventItem[] = [
     distance: "2.1 MI",
     description:
       "A seasonal three-course meal served family style at one long table. Bring an appetite and meet your neighbors.",
+    interestIds: [
+      "foodies-gastronomy",
+      "wine-lovers",
+      "networking-professional",
+    ],
   },
   {
     id: "book-swap-slow-reading",
@@ -112,6 +120,6 @@ export const staticEvents: StaticEventItem[] = [
     distance: "3.0 MI",
     description:
       "Bring a book you love, leave with one you don't know. Then we read together in comfortable silence for an hour.",
+    interestIds: ["book-club", "history-culture", "chill-chat"],
   },
 ]
-

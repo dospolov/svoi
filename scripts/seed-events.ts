@@ -26,6 +26,7 @@ async function main() {
     gradient: e.gradient,
     attendees: e.attendees,
     description: e.description,
+    interestIds: e.interestIds,
   }))
 
   const result = await client.mutation(api.events.seedFromStaticEvents, {
@@ -43,4 +44,3 @@ main().catch((err) => {
   console.error(err)
   process.exitCode = 1
 })
-

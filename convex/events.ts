@@ -71,6 +71,7 @@ export const createEvent = mutation({
     price: v.string(),
     distance: v.string(),
     description: v.string(),
+    interestIds: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const id = await ctx.db.insert("events", args)
@@ -102,6 +103,7 @@ export const seedFromStaticEvents = mutation({
         price: v.string(),
         distance: v.string(),
         description: v.string(),
+        interestIds: v.optional(v.array(v.string())),
       }),
     ),
   },
