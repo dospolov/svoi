@@ -4,6 +4,10 @@ import { authTables } from "@convex-dev/auth/server"
 
 export default defineSchema({
   ...authTables,
+  userProfiles: defineTable({
+    userId: v.string(),
+    name: v.string(),
+  }).index("by_user_id", ["userId"]),
   events: defineTable({
     // Existing `src/lib/events.ts` uses `id` as the route slug (e.g. /sunrise-run-club).
     slug: v.string(),

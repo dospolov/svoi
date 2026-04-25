@@ -2,8 +2,8 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useQuery } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
@@ -22,10 +22,9 @@ import { api } from "../../../convex/_generated/api"
 
 export default function SignInPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const viewer = useQuery(api.users.viewer, {})
   const { signIn } = useAuthActions()
-  const nextParam = searchParams.get("next")
+  const [nextParam, setNextParam] = useState<string | null>(null)
   const isSafeNext = nextParam?.startsWith("/") && !nextParam.startsWith("//")
   const redirectTo = isSafeNext ? nextParam : "/"
   const signUpHref =
@@ -37,6 +36,10 @@ export default function SignInPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    setNextParam(new URLSearchParams(window.location.search).get("next"))
+  }, [])
 
   if (viewer) {
     router.replace(redirectTo)

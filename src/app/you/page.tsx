@@ -3,10 +3,11 @@
 export const dynamic = "force-dynamic"
 
 import Link from "next/link"
-import { useEffect, useMemo, useState } from "react"
-import { useQuery } from "convex/react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useMutation, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuthActions } from "@convex-dev/auth/react"
+import { toast } from "sonner"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,18 +34,9 @@ const interestOptions = [
   "Languages",
 ] as const
 
-function ThemeCorner() {
-  return (
-    <div className="pointer-events-none absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-10">
-      <div className="pointer-events-auto">
-        <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
-      </div>
-    </div>
-  )
-}
-
 export default function YouPage() {
   const viewer = useQuery(api.users.viewer, {})
+  const upsertMyName = useMutation(api.users.upsertMyName)
   const { signOut } = useAuthActions()
   const [name, setName] = useState("")
   const [profession, setProfession] = useState("")
@@ -59,6 +51,10 @@ export default function YouPage() {
   const [youtube, setYoutube] = useState("")
   const [tiktok, setTiktok] = useState("")
   const [otherSocial, setOtherSocial] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
+  const [didInitProfileFields, setDidInitProfileFields] = useState(false)
+  const [showScrollHint, setShowScrollHint] = useState(false)
+  const contentRef = useRef<HTMLDivElement | null>(null)
 
   const displayName = useMemo(
     () => viewer?.name ?? viewer?.email ?? viewer?.subject ?? "Signed in",
@@ -66,13 +62,35 @@ export default function YouPage() {
   )
 
   useEffect(() => {
-    if (viewer?.name && !name) {
-      setName(viewer.name)
+    if (!viewer || didInitProfileFields) {
+      return
     }
-    if (viewer?.email && !email) {
-      setEmail(viewer.email)
+
+    setName(viewer.name ?? "")
+    setEmail(viewer.email ?? "")
+    setDidInitProfileFields(true)
+  }, [viewer, didInitProfileFields])
+
+  useEffect(() => {
+    const contentEl = contentRef.current
+    if (!contentEl) {
+      return
     }
-  }, [viewer, name, email])
+
+    const updateScrollHint = () => {
+      const hasMore = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight > 8
+      setShowScrollHint(hasMore)
+    }
+
+    updateScrollHint()
+    contentEl.addEventListener("scroll", updateScrollHint)
+    window.addEventListener("resize", updateScrollHint)
+
+    return () => {
+      contentEl.removeEventListener("scroll", updateScrollHint)
+      window.removeEventListener("resize", updateScrollHint)
+    }
+  }, [])
 
   const toggleInterest = (interest: string, checked: boolean) => {
     setInterests((prev) =>
@@ -80,10 +98,27 @@ export default function YouPage() {
     )
   }
 
+  const handleSaveChanges = async () => {
+    const nextName = name.trim()
+    if (!nextName) {
+      toast.error("Name is required")
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      await upsertMyName({ name: nextName })
+      toast.success("Name updated")
+    } catch {
+      toast.error("Failed to save name")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   if (viewer === undefined) {
     return (
       <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
-        <ThemeCorner />
         <p className="text-mono-label text-muted-foreground">Loading…</p>
       </div>
     )
@@ -92,15 +127,19 @@ export default function YouPage() {
   if (!viewer) {
     return (
       <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
-        <ThemeCorner />
         <Card className="bg-surface-1">
           <CardHeader>
-            <CardTitle className="font-serif text-3xl italic leading-none">
-              You
-            </CardTitle>
-            <CardDescription>
-              Sign in to see your profile and saved events.
-            </CardDescription>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <CardTitle className="font-serif text-3xl italic leading-none">
+                  You
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Sign in to see your profile and saved events.
+                </CardDescription>
+              </div>
+              <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
+            </div>
           </CardHeader>
           <CardFooter className="gap-3">
             <Button asChild className="flex-1 rounded-full">
@@ -117,15 +156,22 @@ export default function YouPage() {
 
   return (
     <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
-      <ThemeCorner />
-      <Card className="bg-surface-1">
+      <Card className="flex h-[calc(100vh-4.75rem)] max-h-[calc(100vh-4.75rem)] flex-col bg-surface-1">
         <CardHeader>
-          <CardTitle className="font-serif text-3xl italic leading-none">
-            Profile
-          </CardTitle>
-            <CardDescription>{displayName}</CardDescription>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <CardTitle className="font-serif text-3xl italic leading-none">
+                Profile
+              </CardTitle>
+              <CardDescription className="mt-1">{displayName}</CardDescription>
+            </div>
+            <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent
+          ref={contentRef}
+          className="relative flex-1 space-y-4 overflow-y-auto [scrollbar-gutter:stable_both-edges]"
+        >
           <div className="space-y-2">
             <Label htmlFor="profile-name">Name</Label>
             <Input
@@ -256,12 +302,23 @@ export default function YouPage() {
               rows={3}
             />
           </div>
-
+          {showScrollHint ? (
+            <div className="pointer-events-none sticky bottom-0 -mx-6 mt-2 bg-gradient-to-t from-surface-1 via-surface-1/90 to-transparent pb-1 pt-5 text-center text-[11px] text-muted-foreground">
+              Scroll for more
+            </div>
+          ) : null}
         </CardContent>
-        <CardFooter className="flex flex-col gap-3">
-          <Button type="button" className="w-full rounded-full">
-            Save changes
-          </Button>
+        <CardFooter className="flex flex-col gap-3 pb-6">
+          <div className="w-full rounded-2xl bg-background/85 p-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+            <Button
+              type="button"
+              className="h-9 w-full rounded-full"
+              disabled={isSaving}
+              onClick={handleSaveChanges}
+            >
+              {isSaving ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
           <Button
             type="button"
             variant="outline"

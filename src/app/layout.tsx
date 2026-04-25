@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono, Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server"
 import ConvexClientProvider from "./ConvexClientProvider"
 
@@ -39,7 +40,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <ConvexAuthNextjsServerProvider>
-            <ConvexClientProvider>{children}</ConvexClientProvider>
+            <ConvexClientProvider>
+              {children}
+              <Toaster />
+            </ConvexClientProvider>
           </ConvexAuthNextjsServerProvider>
         </ThemeProvider>
       </body>

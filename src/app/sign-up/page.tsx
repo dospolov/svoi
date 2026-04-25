@@ -2,10 +2,10 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useQuery } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -24,10 +24,10 @@ import { api } from "../../../convex/_generated/api"
 
 export default function SignUpPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const viewer = useQuery(api.users.viewer, {})
   const { signIn } = useAuthActions()
-  const nextParam = searchParams.get("next")
+  const upsertMyName = useMutation(api.users.upsertMyName)
+  const [nextParam, setNextParam] = useState<string | null>(null)
   const isSafeNext = nextParam?.startsWith("/") && !nextParam.startsWith("//")
   const redirectTo = isSafeNext ? nextParam : "/you"
   const signInHref =
@@ -44,6 +44,10 @@ export default function SignUpPage() {
   const [age, setAge] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    setNextParam(new URLSearchParams(window.location.search).get("next"))
+  }, [])
 
   if (viewer) {
     router.replace(redirectTo)
@@ -158,6 +162,7 @@ export default function SignUpPage() {
                 formData.set("password", password)
                 formData.set("flow", "signUp")
                 await signIn("password", formData)
+                await upsertMyName({ name: name.trim() })
                 router.replace(redirectTo)
               } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to sign up")
