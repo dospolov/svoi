@@ -1,0 +1,24 @@
+---
+description: Keep AI responses concise and cost-efficient
+alwaysApply: true
+---
+
+# AI Efficiency Rules
+
+- Be concise by default.
+- Return only the code or direct answer needed for the task.
+- Avoid long explanations unless explicitly requested.
+- Focus only on provided context and referenced files.
+
+# Code Change Policy
+
+- Prefer minimal diffs and small targeted edits.
+- Do not rewrite entire files for local changes.
+- Preserve existing APIs and behavior unless asked to change them.
+- Keep naming, style, and architecture consistent with nearby code.
+
+# Interaction Policy
+
+- Do not regenerate broad alternatives unless requested.
+- If context is unclear, ask for the specific file or function.
+- When possible, combine related changes in one response.
