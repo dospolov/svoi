@@ -98,11 +98,11 @@ export default async function EventPage({ params }: PageProps) {
       <div className="fixed bottom-[3.125rem] left-1/2 z-30 w-full max-w-[430px] -translate-x-1/2 px-6">
         <div className="rounded-2xl bg-background/85 p-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70">
           <Button
-            type="button"
+            asChild
             variant="ghost"
             className="h-8 w-full rounded-full bg-accent-lime px-5 text-xs font-semibold text-primary-foreground transition-transform active:scale-[0.98]"
           >
-            Join — {event.price}
+            <Link href="/sign-up">Join — {event.price}</Link>
           </Button>
         </div>
       </div>
