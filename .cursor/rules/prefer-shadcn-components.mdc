@@ -1,11 +1,14 @@
 ---
-description: Prefer shadcn components for UI work
+description: Prefer shadcn and forbid raw form controls in feature code
 alwaysApply: true
 ---
 
-# Prefer shadcn UI components
+# Shadcn-First UI Policy
 
 - For UI implementation, prefer existing components from `shadcn/ui` first.
-- Before creating a new custom UI component, check whether an equivalent `shadcn` component exists and can be adapted.
+- Before creating a new custom UI component, check whether an equivalent `shadcn` component exists in our code base or on shadcn website and can be adapted.
+- If the required `shadcn/ui` component is missing in the codebase, install it first via CLI (for example: `pnpm dlx shadcn@latest add <component-name>`) before building a custom replacement.
 - Reuse project wrapper components built on top of `shadcn` when available.
-- Build custom components only when `shadcn` does not cover the requirement or when product-specific behavior is needed.
+- Build custom components only when `shadcn` does not cover the requirement or when product-specific behavior is needed; in that case, explicitly mention why `shadcn` was not used.
+- Do not use raw HTML form controls (`<input>`, `<select>`, `<textarea>`, `<button>`, `<label>`) directly in app/feature code.
+- Raw controls are allowed only inside shared UI wrapper files in `src/components/ui/*`.
