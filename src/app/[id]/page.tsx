@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button"
 
 type PageProps = {
   params: Promise<{
-    id: string;
-  }>;
-};
+    id: string
+  }>
+}
 
 
 const chips = ["All", "Active", "Craft", "Food & drink", "Music"] as const;

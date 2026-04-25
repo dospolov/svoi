@@ -26,6 +26,11 @@ export default function SignUpPage() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
+  const [city, setCity] = useState("")
+  const [country, setCountry] = useState("Poland")
+  const [gender, setGender] = useState("")
+  const [age, setAge] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -44,6 +49,47 @@ export default function SignUpPage() {
           <CardDescription>Create your account.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          <Input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete="name"
+            required
+          />
+          <Input
+            type="text"
+            placeholder="City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            autoComplete="address-level2"
+            required
+          />
+          <Input
+            type="text"
+            placeholder="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            autoComplete="country-name"
+            required
+          />
+          <Input
+            type="text"
+            placeholder="Gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            autoComplete="sex"
+            required
+          />
+          <Input
+            type="number"
+            placeholder="Age"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            min={1}
+            inputMode="numeric"
+            required
+          />
           <Input
             type="email"
             placeholder="Email"
@@ -68,6 +114,16 @@ export default function SignUpPage() {
             className="w-full rounded-full"
             disabled={submitting}
             onClick={async () => {
+              if (!name.trim() || !city.trim() || !country.trim() || !gender.trim() || !age.trim()) {
+                setError("Please fill in all required fields.")
+                return
+              }
+
+              if (!Number.isInteger(Number(age)) || Number(age) < 1) {
+                setError("Please enter a valid age.")
+                return
+              }
+
               setSubmitting(true)
               setError(null)
               try {
