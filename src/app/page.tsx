@@ -16,7 +16,20 @@ export default async function FeedPage() {
     <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background pb-32 text-foreground">
       {/* Header */}
       <header className="px-6 pt-12">
-        <div className="flex items-start justify-between">
+        <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-[linear-gradient(145deg,oklch(0.99_0_0_/_0.72),oklch(0.96_0.01_250_/_0.5)_55%,oklch(0.94_0.02_220_/_0.36))] p-4 shadow-[0_25px_50px_-38px_rgba(16,24,40,0.45)] backdrop-blur-xl dark:border-white/12 dark:bg-[linear-gradient(145deg,oklch(0.2_0.02_250_/_0.65),oklch(0.16_0.02_250_/_0.52)_55%,oklch(0.13_0.01_250_/_0.38))]">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white/45 via-white/15 to-transparent dark:from-white/20 dark:via-white/5"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -left-12 -top-12 h-40 w-40 rounded-full bg-white/25 blur-3xl dark:bg-white/8"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -bottom-16 h-44 w-44 rounded-full bg-sky-200/35 blur-3xl dark:bg-sky-400/10"
+          />
+          <div className="relative flex items-start justify-between">
           <div>
             <p className="text-mono-label text-muted-foreground">SVOI / VOL.18 / WK17</p>
             <h1 className="mt-3 font-serif text-[44px] leading-[1.05] tracking-tight">
@@ -32,6 +45,7 @@ export default async function FeedPage() {
           >
             <Plus className="h-5 w-5" strokeWidth={2.5} />
           </Button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -54,16 +68,26 @@ export default async function FeedPage() {
       </header>
 
       {/* Event list */}
-      <ul className="mt-2">
-        {events.map((event, idx) => (
-          <li
-            key={event._id}
-            className={`px-6 ${idx > 0 ? "border-t border-border/50" : ""}`}
-          >
+      <ul className="mt-3 space-y-3">
+        {events.map((event) => (
+          <li key={event._id} className="px-6">
+            {(() => {
+              const hasPreview = !!(
+                event.gradient &&
+                gradientClass[event.gradient as keyof typeof gradientClass]
+              )
+              const cardSizeClass = hasPreview
+                ? "min-h-[300px]"
+                : "min-h-[220px]"
+              return (
             <Link
               href={`/${event.slug}`}
-              className="block py-6 transition-opacity active:opacity-70"
+              className={`relative block overflow-hidden rounded-3xl border border-white/20 bg-[linear-gradient(150deg,oklch(0.995_0_0_/_0.78),oklch(0.965_0.01_250_/_0.58)_52%,oklch(0.94_0.02_235_/_0.42))] px-4 py-6 shadow-[0_24px_50px_-40px_rgba(15,23,42,0.5)] backdrop-blur-xl transition-all hover:border-white/30 hover:shadow-[0_30px_54px_-40px_rgba(15,23,42,0.55)] active:opacity-70 dark:border-white/12 dark:bg-[linear-gradient(150deg,oklch(0.22_0.02_250_/_0.66),oklch(0.17_0.02_252_/_0.56)_52%,oklch(0.13_0.02_250_/_0.42))] ${cardSizeClass}`}
             >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white/40 to-transparent dark:from-white/15"
+              />
               <div className="flex items-start gap-4">
                 <span className="text-mono-label w-6 shrink-0 pt-1 text-muted-foreground">
                   {event.index}
@@ -86,18 +110,23 @@ export default async function FeedPage() {
                       {String(event.category).toUpperCase()}
                     </span>
                   </div>
-                  <h2 className="mt-2 font-sans text-2xl font-bold leading-tight tracking-tight">
+                  <h2 className="mt-2 line-clamp-2 font-sans text-2xl font-bold leading-tight tracking-tight">
                     {event.title}
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {event.neighborhood}{" "}
                     <span className="text-foreground/30">·</span> {event.host}
                   </p>
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-foreground/75">
+                    {event.description}
+                  </p>
 
-                  <div className="mt-4 flex items-center gap-4">
-                    <div
-                      className={`h-20 w-24 shrink-0 rounded-xl ${gradientClass[event.gradient as keyof typeof gradientClass]}`}
-                    />
+                  <div className={`mt-4 flex items-center gap-4 ${hasPreview ? "" : "pt-2"}`}>
+                    {hasPreview ? (
+                      <div
+                        className={`h-20 w-24 shrink-0 rounded-xl ${gradientClass[event.gradient as keyof typeof gradientClass]}`}
+                      />
+                    ) : null}
                     <div className="flex flex-1 flex-col gap-2">
                       <AvatarStack attendees={event.attendees ?? []} />
                       <div className="text-mono-label text-foreground">
@@ -111,12 +140,16 @@ export default async function FeedPage() {
                 </div>
                 <Bookmark
                   className={`h-5 w-5 shrink-0 ${
-                    idx === 1 ? "fill-accent-lime text-accent-lime" : "text-muted-foreground"
+                    event.slug === "home-party"
+                      ? "fill-accent-lime text-accent-lime"
+                      : "text-muted-foreground"
                   }`}
                   strokeWidth={2}
                 />
               </div>
             </Link>
+              )
+            })()}
           </li>
         ))}
       </ul>
