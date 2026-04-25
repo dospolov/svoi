@@ -118,7 +118,7 @@ export function FeedEventsSection({ events }: FeedEventsSectionProps) {
   return (
     <>
       <header className="px-6">
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center gap-2 px-4">
           <EventInterestsFilterToggle
             value={selectedInterestIds}
             onChange={setSelectedInterestIds}
@@ -171,7 +171,7 @@ export function FeedEventsSection({ events }: FeedEventsSectionProps) {
                       className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white/40 to-transparent dark:from-white/15"
                     />
                     <div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex w-full items-center gap-4">
                         <span className="flex w-6 shrink-0 justify-center text-mono-label text-muted-foreground">
                           {event.index ?? ""}
                         </span>

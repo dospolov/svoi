@@ -23,15 +23,16 @@ export default async function FeedPage() {
             aria-hidden
             className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-sky-200/35 blur-2xl dark:bg-sky-400/10"
           />
-          <div className="absolute right-2 top-2 z-10">
+          <div className="absolute top-2 right-4 z-10">
             <ThemeToggle className="h-9 w-9 rounded-xl border border-input/70 bg-background/85 shadow-none backdrop-blur-sm" />
           </div>
           <div className="relative pr-12">
-            <h1 className="font-serif text-2xl leading-snug tracking-tight sm:text-[1.65rem]">
-              Nothing to do
-              <br />
-              <span className="text-accent-lime italic">tonight?</span>
+            <h1 className="font-serif text-[1.45rem] leading-snug tracking-tight sm:text-[1.6rem]">
+              Host events, join meetups, build communities.
             </h1>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Your hub for Warsaw's best communities.
+            </p>
           </div>
         </div>
       </header>
@@ -41,4 +42,3 @@ export default async function FeedPage() {
     </div>
   )
 }
-
