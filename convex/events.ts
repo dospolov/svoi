@@ -52,18 +52,25 @@ export const getEvent = query({
 export const createEvent = mutation({
   args: {
     slug: v.string(),
+    index: v.string(),
+    day: v.string(),
+    date: v.string(),
+    time: v.string(),
+    going: v.string(),
     title: v.string(),
-    description: v.optional(v.string()),
     category: v.string(),
     neighborhood: v.string(),
-    day: v.optional(v.string()),
-    date: v.optional(v.string()),
-    time: v.optional(v.string()),
-    price: v.optional(v.string()),
-    distance: v.optional(v.string()),
-    host: v.optional(v.string()),
-    gradient: v.optional(v.string()),
-    attendeeNames: v.optional(v.array(v.string())),
+    host: v.string(),
+    gradient: v.string(),
+    attendees: v.array(
+      v.object({
+        initials: v.string(),
+        color: v.string(),
+      }),
+    ),
+    price: v.string(),
+    distance: v.string(),
+    description: v.string(),
   },
   handler: async (ctx, args) => {
     const id = await ctx.db.insert("events", args)
@@ -76,18 +83,25 @@ export const seedFromStaticEvents = mutation({
     events: v.array(
       v.object({
         slug: v.string(),
+        index: v.string(),
+        day: v.string(),
+        date: v.string(),
+        time: v.string(),
+        going: v.string(),
         title: v.string(),
-        description: v.optional(v.string()),
         category: v.string(),
         neighborhood: v.string(),
-        day: v.optional(v.string()),
-        date: v.optional(v.string()),
-        time: v.optional(v.string()),
-        price: v.optional(v.string()),
-        distance: v.optional(v.string()),
-        host: v.optional(v.string()),
-        gradient: v.optional(v.string()),
-        attendeeNames: v.optional(v.array(v.string())),
+        host: v.string(),
+        gradient: v.string(),
+        attendees: v.array(
+          v.object({
+            initials: v.string(),
+            color: v.string(),
+          }),
+        ),
+        price: v.string(),
+        distance: v.string(),
+        description: v.string(),
       }),
     ),
   },
@@ -102,6 +116,7 @@ export const seedFromStaticEvents = mutation({
         .unique()
 
       if (existing) {
+        await ctx.db.patch(existing._id, event)
         skipped += 1
         continue
       }

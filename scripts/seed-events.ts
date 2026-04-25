@@ -1,6 +1,6 @@
 import { ConvexHttpClient } from "convex/browser"
 import { api } from "../convex/_generated/api"
-import { events } from "../src/lib/events"
+import { staticEvents } from "./static-events"
 
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
 if (!convexUrl) {
@@ -10,20 +10,22 @@ if (!convexUrl) {
 const client = new ConvexHttpClient(convexUrl)
 
 async function main() {
-  const payload = events.map((e) => ({
+  const payload = staticEvents.map((e) => ({
     slug: e.id,
-    title: e.title,
-    description: e.description,
-    category: e.category,
-    neighborhood: e.neighborhood,
+    index: e.index,
     day: e.day,
     date: e.date,
     time: e.time,
+    going: e.going,
+    title: e.title,
+    category: e.category,
+    neighborhood: e.neighborhood,
     price: e.price,
     distance: e.distance,
     host: e.host,
     gradient: e.gradient,
-    attendeeNames: e.attendees.map((a) => a.initials),
+    attendees: e.attendees,
+    description: e.description,
   }))
 
   const result = await client.mutation(api.events.seedFromStaticEvents, {

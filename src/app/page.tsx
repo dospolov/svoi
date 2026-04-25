@@ -1,12 +1,16 @@
-import { Bookmark, Plus } from "lucide-react";
-import { events, categoryColor, gradientClass } from "@/lib/events";
-import { AvatarStack } from "@/components/Avatar";
-import { BottomNav } from "@/components/BottomNav";
-import Link from "next/link";
+import { Bookmark, Plus } from "lucide-react"
+import { categoryColor, gradientClass } from "@/lib/events"
+import { AvatarStack } from "@/components/Avatar"
+import { BottomNav } from "@/components/BottomNav"
+import Link from "next/link"
+import { api, getConvexClient } from "@/lib/convex"
 
 const tabs = ["Near me", "This week", "New", "Most going"] as const;
 
-export default function FeedPage() {
+export default async function FeedPage() {
+  const client = getConvexClient()
+  const events = await client.query(api.events.listEvents, {})
+
   return (
     <div className="mx-auto min-h-screen w-full max-w-[430px] bg-background pb-32 text-foreground">
       {/* Header */}
@@ -51,11 +55,11 @@ export default function FeedPage() {
       <ul className="mt-2">
         {events.map((event, idx) => (
           <li
-            key={event.id}
+            key={event._id}
             className={`px-6 ${idx > 0 ? "border-t border-border/50" : ""}`}
           >
             <Link
-              href={`/${event.id}`}
+              href={`/${event.slug}`}
               className="block py-6 transition-opacity active:opacity-70"
             >
               <div className="flex items-start gap-4">
@@ -64,14 +68,20 @@ export default function FeedPage() {
                 </span>
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2 text-mono-label">
-                    <span className={categoryColor[event.category]}>{event.day}</span>
+                    <span className={categoryColor[event.category as keyof typeof categoryColor]}>
+                      {event.day}
+                    </span>
                     <span className="text-muted-foreground">·</span>
-                    <span className={categoryColor[event.category]}>{event.date}</span>
+                    <span className={categoryColor[event.category as keyof typeof categoryColor]}>
+                      {event.date}
+                    </span>
                     <span className="text-muted-foreground">·</span>
-                    <span className={categoryColor[event.category]}>{event.time}</span>
+                    <span className={categoryColor[event.category as keyof typeof categoryColor]}>
+                      {event.time}
+                    </span>
                     <span className="text-muted-foreground">·</span>
-                    <span className={categoryColor[event.category]}>
-                      {event.category.toUpperCase()}
+                    <span className={categoryColor[event.category as keyof typeof categoryColor]}>
+                      {String(event.category).toUpperCase()}
                     </span>
                   </div>
                   <h2 className="mt-2 font-sans text-2xl font-bold leading-tight tracking-tight">
@@ -84,10 +94,10 @@ export default function FeedPage() {
 
                   <div className="mt-4 flex items-center gap-4">
                     <div
-                      className={`h-20 w-24 shrink-0 rounded-xl ${gradientClass[event.gradient]}`}
+                      className={`h-20 w-24 shrink-0 rounded-xl ${gradientClass[event.gradient as keyof typeof gradientClass]}`}
                     />
                     <div className="flex flex-1 flex-col gap-2">
-                      <AvatarStack attendees={event.attendees} />
+                      <AvatarStack attendees={event.attendees ?? []} />
                       <div className="text-mono-label text-foreground">
                         {event.going}
                       </div>
@@ -111,6 +121,6 @@ export default function FeedPage() {
 
       <BottomNav />
     </div>
-  );
+  )
 }
 
