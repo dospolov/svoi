@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "convex": "convex dev",
+    "seed:events": "tsx -r dotenv/config scripts/seed-events.ts dotenv_config_path=.env.local",
     "lint": "biome check",
     "format": "biome format --write"
   },
@@ -13,6 +15,7 @@
     "@base-ui/react": "^1.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "convex": "^1.36.1",
     "lucide-react": "^1.11.0",
     "next": "16.2.4",
     "next-themes": "^0.4.6",
@@ -30,7 +33,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "dotenv": "^17.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^6"
   }
 }
