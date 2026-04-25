@@ -3,11 +3,16 @@
 export const dynamic = "force-dynamic"
 
 import Link from "next/link"
+import { useEffect, useMemo, useState } from "react"
 import { useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Card,
   CardContent,
@@ -16,6 +21,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+
+const interestOptions = [
+  "Sports",
+  "Music",
+  "Movies",
+  "Travel",
+  "Business",
+  "Technology",
+  "Art",
+  "Languages",
+] as const
 
 function ThemeCorner() {
   return (
@@ -30,6 +46,39 @@ function ThemeCorner() {
 export default function YouPage() {
   const viewer = useQuery(api.users.viewer, {})
   const { signOut } = useAuthActions()
+  const [name, setName] = useState("")
+  const [profession, setProfession] = useState("")
+  const [city, setCity] = useState("")
+  const [age, setAge] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [interests, setInterests] = useState<string[]>([])
+  const [instagram, setInstagram] = useState("")
+  const [telegram, setTelegram] = useState("")
+  const [whatsapp, setWhatsapp] = useState("")
+  const [youtube, setYoutube] = useState("")
+  const [tiktok, setTiktok] = useState("")
+  const [otherSocial, setOtherSocial] = useState("")
+
+  const displayName = useMemo(
+    () => viewer?.name ?? viewer?.email ?? viewer?.subject ?? "Signed in",
+    [viewer]
+  )
+
+  useEffect(() => {
+    if (viewer?.name && !name) {
+      setName(viewer.name)
+    }
+    if (viewer?.email && !email) {
+      setEmail(viewer.email)
+    }
+  }, [viewer, name, email])
+
+  const toggleInterest = (interest: string, checked: boolean) => {
+    setInterests((prev) =>
+      checked ? [...prev, interest] : prev.filter((item) => item !== interest)
+    )
+  }
 
   if (viewer === undefined) {
     return (
@@ -74,16 +123,145 @@ export default function YouPage() {
           <CardTitle className="font-serif text-3xl italic leading-none">
             Profile
           </CardTitle>
-          <CardDescription>
-            {viewer?.name ?? viewer?.email ?? viewer?.subject ?? "Signed in"}
-          </CardDescription>
+            <CardDescription>{displayName}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="text-mono-label text-muted-foreground">
-            {viewer?.email ? `Email: ${viewer.email}` : null}
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="profile-name">Name</Label>
+            <Input
+              id="profile-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={viewer?.name ?? "Enter your name"}
+              autoComplete="name"
+            />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profile-profession">Profession</Label>
+            <Input
+              id="profile-profession"
+              value={profession}
+              onChange={(e) => setProfession(e.target.value)}
+              placeholder="Example: Product Designer"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="profile-city">City</Label>
+              <Input
+                id="profile-city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Warsaw"
+                autoComplete="address-level2"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="profile-age">Age</Label>
+              <Input
+                id="profile-age"
+                type="number"
+                min={1}
+                inputMode="numeric"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="25"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profile-email">Email</Label>
+            <Input
+              id="profile-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profile-password">Password</Label>
+            <Input
+              id="profile-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter a new password"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Interests</p>
+            <div className="grid grid-cols-2 gap-2 rounded-md border border-input p-3">
+              {interestOptions.map((interest) => (
+                <div key={interest} className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    id={`interest-${interest}`}
+                    checked={interests.includes(interest)}
+                    onCheckedChange={(checked) =>
+                      toggleInterest(interest, Boolean(checked))
+                    }
+                  />
+                  <Label htmlFor={`interest-${interest}`}>{interest}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Social media</p>
+            <div className="space-y-2">
+              <Input
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                placeholder="Instagram"
+              />
+              <Input
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                placeholder="Telegram"
+              />
+              <Input
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="WhatsApp"
+              />
+              <Input
+                value={youtube}
+                onChange={(e) => setYoutube(e.target.value)}
+                placeholder="YouTube"
+              />
+              <Input
+                value={tiktok}
+                onChange={(e) => setTiktok(e.target.value)}
+                placeholder="TikTok"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profile-other">Other</Label>
+            <Textarea
+              id="profile-other"
+              value={otherSocial}
+              onChange={(e) => setOtherSocial(e.target.value)}
+              placeholder="Add other links or contacts"
+              rows={3}
+            />
+          </div>
+
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-3">
+          <Button type="button" className="w-full rounded-full">
+            Save changes
+          </Button>
           <Button
             type="button"
             variant="outline"
