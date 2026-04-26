@@ -3,11 +3,27 @@ import {
   modifyAccountCredentials,
   retrieveAccount,
 } from "@convex-dev/auth/server"
+import type { Doc } from "./_generated/dataModel"
 import { internal } from "./_generated/api"
+import type { MutationCtx, QueryCtx } from "./_generated/server"
 import { action, internalQuery, mutation, query } from "./_generated/server"
 import { v } from "convex/values"
 
 const PASSWORD_PROVIDER_ID = "password"
+
+/** Profile rows use `userProfiles.userId` === Convex Auth `users` document id. */
+async function getProfileForViewer(
+  ctx: QueryCtx | MutationCtx,
+): Promise<Doc<"userProfiles"> | null> {
+  const authUserId = await getAuthUserId(ctx)
+  if (authUserId === null) {
+    return null
+  }
+  return await ctx.db
+    .query("userProfiles")
+    .withIndex("by_user_id", (q) => q.eq("userId", authUserId))
+    .unique()
+}
 
 /** Login email for the password provider (not the profile email field). */
 export const getAuthAccountEmail = internalQuery({
@@ -85,10 +101,7 @@ export const viewer = query({
     const authUserId = await getAuthUserId(ctx)
     const authUser = authUserId !== null ? await ctx.db.get(authUserId) : null
 
-    const profile = await ctx.db
-      .query("userProfiles")
-      .withIndex("by_user_id", (q) => q.eq("userId", identity.subject))
-      .unique()
+    const profile = await getProfileForViewer(ctx)
 
     const name =
       profile?.name ?? authUser?.name ?? identity.name ?? ""
@@ -120,6 +133,12 @@ export const upsertMyName = mutation({
       throw new Error("Unauthorized")
     }
 
+    const authUserId = await getAuthUserId(ctx)
+    if (authUserId === null) {
+      throw new Error("Unauthorized")
+    }
+    const canonicalProfileUserId = authUserId as string
+
     const nextName = args.name.trim()
     const nextProfession = args.profession?.trim() ?? ""
     const nextCity = args.city?.trim() ?? ""
@@ -132,19 +151,18 @@ export const upsertMyName = mutation({
       throw new Error("Email is required")
     }
 
-    const existing = await ctx.db
-      .query("userProfiles")
-      .withIndex("by_user_id", (q) => q.eq("userId", identity.subject))
-      .unique()
+    const existing = await getProfileForViewer(ctx)
 
     if (existing) {
       const patchData: {
+        userId: string
         name: string
         profession: string
         city: string
         age: string
         email: string
       } = {
+        userId: canonicalProfileUserId,
         name: nextName,
         profession: nextProfession,
         city: nextCity,
@@ -163,7 +181,7 @@ export const upsertMyName = mutation({
       age: string
       email: string
     } = {
-      userId: identity.subject,
+      userId: canonicalProfileUserId,
       name: nextName,
       profession: nextProfession,
       city: nextCity,
