@@ -40,14 +40,28 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  const getSignInErrorMessage = (err: unknown) => {
+    const raw = err instanceof Error ? err.message : String(err)
+    if (
+      /invalidsecret/i.test(raw) ||
+      /retrieveaccount/i.test(raw) ||
+      /credentialssignin/i.test(raw)
+    ) {
+      return "Invalid email or password."
+    }
+    return "Failed to sign in."
+  }
+
   useEffect(() => {
     setNextParam(new URLSearchParams(window.location.search).get("next"))
   }, [])
 
-  if (viewer) {
+  useEffect(() => {
+    if (!viewer) {
+      return
+    }
     router.replace(redirectTo)
-    return null
-  }
+  }, [viewer, redirectTo, router])
 
   return (
     <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
@@ -98,7 +112,7 @@ export default function SignInPage() {
                 await signIn("password", formData)
                 router.replace(redirectTo)
               } catch (e) {
-                setError(e instanceof Error ? e.message : "Failed to sign in")
+                setError(getSignInErrorMessage(e))
               } finally {
                 setSubmitting(false)
               }

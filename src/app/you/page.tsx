@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useMutation, useQuery } from "convex/react"
+import { useAction, useMutation, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { toast } from "sonner"
@@ -37,13 +37,15 @@ const interestOptions = [
 export default function YouPage() {
   const viewer = useQuery(api.users.viewer, {})
   const upsertMyName = useMutation(api.users.upsertMyName)
+  const changeMyPassword = useAction(api.users.changeMyPassword)
   const { signOut } = useAuthActions()
   const [name, setName] = useState("")
   const [profession, setProfession] = useState("")
   const [city, setCity] = useState("")
   const [age, setAge] = useState("")
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
   const [interests, setInterests] = useState<string[]>([])
   const [instagram, setInstagram] = useState("")
   const [telegram, setTelegram] = useState("")
@@ -52,7 +54,6 @@ export default function YouPage() {
   const [tiktok, setTiktok] = useState("")
   const [otherSocial, setOtherSocial] = useState("")
   const [isSaving, setIsSaving] = useState(false)
-  const [didInitProfileFields, setDidInitProfileFields] = useState(false)
   const [showScrollHint, setShowScrollHint] = useState(false)
   const contentRef = useRef<HTMLDivElement | null>(null)
 
@@ -61,8 +62,23 @@ export default function YouPage() {
     [viewer]
   )
 
+  /** Re-hydrate when Convex pushes newer profile (avoids one-shot init racing signup upsert). */
+  const serverProfileSignature = useMemo(() => {
+    if (!viewer) {
+      return null
+    }
+    return [
+      viewer.subject,
+      viewer.name ?? "",
+      viewer.profession ?? "",
+      viewer.city ?? "",
+      viewer.age ?? "",
+      viewer.email ?? "",
+    ].join("\u0001")
+  }, [viewer])
+
   useEffect(() => {
-    if (!viewer || didInitProfileFields) {
+    if (!viewer || serverProfileSignature === null) {
       return
     }
 
@@ -71,9 +87,7 @@ export default function YouPage() {
     setCity(viewer.city ?? "")
     setAge(viewer.age ?? "")
     setEmail(viewer.email ?? "")
-    setPassword(viewer.password ?? "")
-    setDidInitProfileFields(true)
-  }, [viewer, didInitProfileFields])
+  }, [viewer, serverProfileSignature])
 
   useEffect(() => {
     const contentEl = contentRef.current
@@ -107,7 +121,6 @@ export default function YouPage() {
     const nextCity = city.trim()
     const nextAge = age.trim()
     const nextEmail = email.trim()
-    const nextPassword = password.trim()
     if (!nextName) {
       toast.error("Name is required")
       return
@@ -128,19 +141,34 @@ export default function YouPage() {
       toast.error("Email is required")
       return
     }
+    const nextNewPassword = newPassword.trim()
+    const nextCurrentPassword = currentPassword.trim()
+    if (nextNewPassword && !nextCurrentPassword) {
+      toast.error("Enter your current password to set a new password")
+      return
+    }
     setIsSaving(true)
     try {
+      if (nextNewPassword) {
+        await changeMyPassword({
+          currentPassword: nextCurrentPassword,
+          newPassword: nextNewPassword,
+        })
+      }
       await upsertMyName({
         name: nextName,
         profession: profession.trim(),
         city: nextCity,
         age: nextAge,
         email: nextEmail,
-        password: nextPassword || undefined,
       })
-      toast.success("Profile updated")
-    } catch {
-      toast.error("Failed to save profile")
+      setCurrentPassword("")
+      setNewPassword("")
+      toast.success(
+        nextNewPassword ? "Profile and password updated" : "Profile updated"
+      )
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save")
     } finally {
       setIsSaving(false)
     }
@@ -266,13 +294,25 @@ export default function YouPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="profile-password">Password</Label>
+            <p className="text-sm font-medium">Password</p>
+            <p className="text-xs text-muted-foreground">
+              Updates your Convex Auth sign-in password (hashed on the server). Leave new
+              password blank to keep the current one.
+            </p>
             <Input
-              id="profile-password"
+              id="profile-current-password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter a new password (optional)"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Current password (required if changing)"
+              autoComplete="current-password"
+            />
+            <Input
+              id="profile-new-password"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New password (min. 8 characters)"
               autoComplete="new-password"
             />
           </div>

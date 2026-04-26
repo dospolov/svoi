@@ -11,7 +11,6 @@ export default defineSchema({
     city: v.optional(v.string()),
     age: v.optional(v.string()),
     email: v.optional(v.string()),
-    password: v.optional(v.string()),
   }).index("by_user_id", ["userId"]),
   events: defineTable({
     // Existing `src/lib/events.ts` uses `id` as the route slug (e.g. /sunrise-run-club).

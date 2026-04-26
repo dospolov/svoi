@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { useMutation, useQuery } from "convex/react"
+import { useConvexAuth, useMutation, useQuery } from "convex/react"
 import { useAuthActions } from "@convex-dev/auth/react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -24,6 +24,7 @@ import { api } from "../../../convex/_generated/api"
 
 export default function SignUpPage() {
   const router = useRouter()
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth()
   const viewer = useQuery(api.users.viewer, {})
   const { signIn } = useAuthActions()
   const upsertMyName = useMutation(api.users.upsertMyName)
@@ -45,6 +46,12 @@ export default function SignUpPage() {
   const [country, setCountry] = useState("Poland")
   const [gender, setGender] = useState("")
   const [age, setAge] = useState("")
+  const [pendingProfile, setPendingProfile] = useState<{
+    name: string
+    city: string
+    age: string
+    email: string
+  } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -52,10 +59,63 @@ export default function SignUpPage() {
     setNextParam(new URLSearchParams(window.location.search).get("next"))
   }, [])
 
-  if (viewer) {
+  useEffect(() => {
+    if (!pendingProfile || isAuthLoading || !isAuthenticated) {
+      return
+    }
+
+    let isCancelled = false
+    const saveProfile = async () => {
+      try {
+        await upsertMyName(pendingProfile)
+        if (!isCancelled) {
+          setPendingProfile(null)
+          router.replace(redirectTo)
+        }
+      } catch (e) {
+        if (!isCancelled) {
+          setError(e instanceof Error ? e.message : "Failed to sign up")
+          setSubmitting(false)
+          setPendingProfile(null)
+        }
+      }
+    }
+
+    void saveProfile()
+    return () => {
+      isCancelled = true
+    }
+  }, [
+    pendingProfile,
+    isAuthLoading,
+    isAuthenticated,
+    upsertMyName,
+    redirectTo,
+    router,
+  ])
+
+  useEffect(() => {
+    if (!pendingProfile || isAuthenticated || isAuthLoading) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setError("Authentication is taking too long. Please try again.")
+      setPendingProfile(null)
+      setSubmitting(false)
+    }, 8000)
+
+    return () => {
+      window.clearTimeout(timer)
+    }
+  }, [pendingProfile, isAuthenticated, isAuthLoading])
+
+  useEffect(() => {
+    if (!viewer || pendingProfile) {
+      return
+    }
     router.replace(redirectTo)
-    return null
-  }
+  }, [viewer, pendingProfile, redirectTo, router])
 
   return (
     <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
@@ -146,7 +206,7 @@ export default function SignUpPage() {
           <Button
             type="button"
             className="w-full rounded-full"
-            disabled={submitting}
+            disabled={submitting || !!pendingProfile}
             onClick={async () => {
               if (!name.trim() || !city.trim() || !country.trim() || !gender.trim() || !age.trim()) {
                 setError("Please fill in all required fields.")
@@ -154,6 +214,10 @@ export default function SignUpPage() {
               }
               if (!email.trim()) {
                 setError("Email is required.")
+                return
+              }
+              if (!password.trim()) {
+                setError("Password is required for password sign up.")
                 return
               }
 
@@ -165,24 +229,19 @@ export default function SignUpPage() {
               setSubmitting(true)
               setError(null)
               try {
-                const nextPassword = password.trim()
-                const authPassword = nextPassword || crypto.randomUUID()
                 const formData = new FormData()
                 formData.set("email", email.trim())
-                formData.set("password", authPassword)
+                formData.set("password", password.trim())
                 formData.set("flow", "signUp")
                 await signIn("password", formData)
-                await upsertMyName({
+                setPendingProfile({
                   name: name.trim(),
                   city: city.trim(),
                   age: age.trim(),
                   email: email.trim(),
-                  password: nextPassword || undefined,
                 })
-                router.replace(redirectTo)
               } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to sign up")
-              } finally {
                 setSubmitting(false)
               }
             }}
