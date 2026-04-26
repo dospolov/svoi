@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import Link from "next/link"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useAction, useMutation, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { useAuthActions } from "@convex-dev/auth/react"
@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const interestOptions = [
   "Sports",
@@ -54,8 +55,6 @@ export default function YouPage() {
   const [tiktok, setTiktok] = useState("")
   const [otherSocial, setOtherSocial] = useState("")
   const [isSaving, setIsSaving] = useState(false)
-  const [showScrollHint, setShowScrollHint] = useState(false)
-  const contentRef = useRef<HTMLDivElement | null>(null)
 
   const displayName = useMemo(
     () => viewer?.name ?? viewer?.email ?? viewer?.subject ?? "Signed in",
@@ -88,27 +87,6 @@ export default function YouPage() {
     setAge(viewer.age ?? "")
     setEmail(viewer.email ?? "")
   }, [viewer, serverProfileSignature])
-
-  useEffect(() => {
-    const contentEl = contentRef.current
-    if (!contentEl) {
-      return
-    }
-
-    const updateScrollHint = () => {
-      const hasMore = contentEl.scrollHeight - contentEl.scrollTop - contentEl.clientHeight > 8
-      setShowScrollHint(hasMore)
-    }
-
-    updateScrollHint()
-    contentEl.addEventListener("scroll", updateScrollHint)
-    window.addEventListener("resize", updateScrollHint)
-
-    return () => {
-      contentEl.removeEventListener("scroll", updateScrollHint)
-      window.removeEventListener("resize", updateScrollHint)
-    }
-  }, [])
 
   const toggleInterest = (interest: string, checked: boolean) => {
     setInterests((prev) =>
@@ -176,15 +154,81 @@ export default function YouPage() {
 
   if (viewer === undefined) {
     return (
-      <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
-        <p className="text-mono-label text-muted-foreground">Loading…</p>
+      <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-background px-6 pt-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] text-foreground">
+        <Card className="flex min-h-0 flex-1 flex-col gap-2 bg-surface-1 py-1">
+          <CardHeader className="shrink-0">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <CardTitle className="font-serif text-3xl italic leading-none">
+                  Profile
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  <Skeleton className="mt-1 h-4 w-40" />
+                </CardDescription>
+              </div>
+              <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
+            </div>
+          </CardHeader>
+          <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]">
+            <div className="space-y-2">
+              <Label htmlFor="profile-name-loading">Name</Label>
+              <Skeleton id="profile-name-loading" className="h-9 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-profession-loading">Profession</Label>
+              <Skeleton id="profile-profession-loading" className="h-9 w-full" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="profile-city-loading">City</Label>
+                <Skeleton id="profile-city-loading" className="h-9 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profile-age-loading">Age</Label>
+                <Skeleton id="profile-age-loading" className="h-9 w-full" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-email-loading">Email</Label>
+              <Skeleton id="profile-email-loading" className="h-9 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-9 w-full" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-[7.25rem] w-full rounded-md" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <div className="space-y-2">
+                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-9 w-full" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profile-other-loading">Other</Label>
+              <Skeleton id="profile-other-loading" className="min-h-[4.5rem] w-full" />
+            </div>
+          </CardContent>
+          <CardFooter className="shrink-0 flex-col gap-2 border-t border-border/40 bg-surface-1 py-1.5">
+            <Button type="button" className="h-9 w-full rounded-full" disabled>
+              Save changes
+            </Button>
+            <Button type="button" variant="outline" className="h-9 w-full rounded-full" disabled>
+              Sign out
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     )
   }
 
   if (!viewer) {
     return (
-      <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center bg-background px-6 py-12 text-foreground">
         <Card className="bg-surface-1">
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
@@ -213,9 +257,9 @@ export default function YouPage() {
   }
 
   return (
-    <div className="relative mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 pb-32 pt-12 text-foreground">
-      <Card className="flex h-[calc(100vh-4.75rem)] max-h-[calc(100vh-4.75rem)] flex-col bg-surface-1">
-        <CardHeader>
+    <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-background px-6 pt-[max(0.25rem,env(safe-area-inset-top))] pb-[max(0.25rem,env(safe-area-inset-bottom))] text-foreground">
+      <Card className="flex min-h-0 flex-1 flex-col gap-2 bg-surface-1 py-1">
+        <CardHeader className="shrink-0">
           <div className="flex items-start justify-between gap-3">
             <div>
               <CardTitle className="font-serif text-3xl italic leading-none">
@@ -226,10 +270,7 @@ export default function YouPage() {
             <ThemeToggle className="h-9 w-9 rounded-xl border-border/70 bg-background/85 shadow-none backdrop-blur-sm" />
           </div>
         </CardHeader>
-        <CardContent
-          ref={contentRef}
-          className="relative flex-1 space-y-4 overflow-y-auto [scrollbar-gutter:stable_both-edges]"
-        >
+        <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-y-contain [scrollbar-gutter:stable]">
           <div className="space-y-2">
             <Label htmlFor="profile-name">Name</Label>
             <Input
@@ -373,27 +414,20 @@ export default function YouPage() {
               rows={3}
             />
           </div>
-          {showScrollHint ? (
-            <div className="pointer-events-none sticky bottom-0 -mx-6 mt-2 bg-gradient-to-t from-surface-1 via-surface-1/90 to-transparent pb-1 pt-5 text-center text-[11px] text-muted-foreground">
-              Scroll for more
-            </div>
-          ) : null}
         </CardContent>
-        <CardFooter className="flex flex-col gap-3 pb-6">
-          <div className="w-full rounded-2xl bg-background/85 p-1.5 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-            <Button
-              type="button"
-              className="h-9 w-full rounded-full"
-              disabled={isSaving}
-              onClick={handleSaveChanges}
-            >
-              {isSaving ? "Saving..." : "Save changes"}
-            </Button>
-          </div>
+        <CardFooter className="shrink-0 flex-col gap-2 border-t border-border/40 bg-surface-1 py-1.5">
+          <Button
+            type="button"
+            className="h-9 w-full rounded-full"
+            disabled={isSaving}
+            onClick={handleSaveChanges}
+          >
+            {isSaving ? "Saving..." : "Save changes"}
+          </Button>
           <Button
             type="button"
             variant="outline"
-            className="w-full rounded-full"
+            className="h-9 w-full rounded-full"
             onClick={() => signOut()}
           >
             Sign out
