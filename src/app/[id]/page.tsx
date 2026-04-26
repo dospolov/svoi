@@ -9,13 +9,20 @@ import { api, getConvexClient } from "@/lib/convex"
 import { Button } from "@/components/ui/button"
 
 type PageProps = {
-  params: {
+  params:
+    | {
+        id: string
+      }
+    | Promise<{
     id: string
-  }
+      }>
 }
 
 export default async function EventPage({ params }: PageProps) {
-  const { id } = params
+  const { id } = await Promise.resolve(params)
+  if (!id) {
+    notFound()
+  }
   const client = getConvexClient()
   const event = await client.query(api.events.getEventBySlug, { slug: id })
   if (!event) {
