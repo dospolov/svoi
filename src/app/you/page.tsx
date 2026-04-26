@@ -294,26 +294,23 @@ export default function YouPage() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-medium">Password</p>
-            <p className="text-xs text-muted-foreground">
-              Updates your Convex Auth sign-in password (hashed on the server). Leave new
-              password blank to keep the current one.
-            </p>
             <Input
               id="profile-current-password"
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Current password (required if changing)"
+              placeholder="Current password"
               autoComplete="current-password"
+              aria-label="Current password"
             />
             <Input
               id="profile-new-password"
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New password (min. 8 characters)"
+              placeholder="New password"
               autoComplete="new-password"
+              aria-label="New password"
             />
           </div>
 
