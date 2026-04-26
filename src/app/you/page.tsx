@@ -156,7 +156,7 @@ export default function YouPage() {
   if (viewer === undefined) {
     return (
       <>
-        <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-background px-6 pt-[max(0.25rem,env(safe-area-inset-top))] pb-[max(3.125rem,calc(env(safe-area-inset-bottom)+2.625rem))] text-foreground">
+        <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-background px-6 pt-[max(0.375rem,env(safe-area-inset-top))] pb-[max(3.5rem,calc(env(safe-area-inset-bottom)+3rem))] text-foreground">
           <Card className="flex min-h-0 flex-1 flex-col gap-2 bg-surface-1 py-1">
             <CardHeader className="shrink-0">
               <div className="flex items-start justify-between gap-3">
@@ -248,7 +248,7 @@ export default function YouPage() {
   if (!viewer) {
     return (
       <>
-        <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center bg-background px-6 py-12 pb-[max(3.125rem,calc(env(safe-area-inset-bottom)+2.625rem))] text-foreground">
+        <div className="relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center bg-background px-6 py-12 pb-[max(3.5rem,calc(env(safe-area-inset-bottom)+3rem))] text-foreground">
           <Card className="bg-surface-1">
             <CardHeader>
               <div className="flex items-start justify-between gap-3">
@@ -280,7 +280,7 @@ export default function YouPage() {
 
   return (
     <>
-      <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-background px-6 pt-[max(0.25rem,env(safe-area-inset-top))] pb-[max(3.125rem,calc(env(safe-area-inset-bottom)+2.625rem))] text-foreground">
+      <div className="relative mx-auto flex h-dvh w-full max-w-[430px] flex-col overflow-hidden bg-background px-6 pt-[max(0.375rem,env(safe-area-inset-top))] pb-[max(3.5rem,calc(env(safe-area-inset-bottom)+3rem))] text-foreground">
         <Card className="flex min-h-0 flex-1 flex-col gap-2 bg-surface-1 py-1">
           <CardHeader className="shrink-0">
             <div className="flex items-start justify-between gap-3">

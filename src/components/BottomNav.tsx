@@ -14,7 +14,7 @@ type Item = {
 const items: Item[] = [
   { to: "/", label: "Feed", Icon: Home, enabled: true },
   { to: "/discover", label: "Map", Icon: Search, enabled: false },
-  { to: "/saved", label: "Saved", Icon: Bookmark, enabled: false },
+  { to: "/saved", label: "Saved", Icon: Bookmark, enabled: true },
   { to: "/you", label: "You", Icon: User, enabled: true },
 ]
 
@@ -25,7 +25,11 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 px-4 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-around rounded-full border border-border/60 bg-surface-1/85 px-1 py-1.5 shadow-[0_-8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-[oklch(0.2_0.02_250_/_0.78)] dark:shadow-[0_-10px_36px_rgba(0,0,0,0.65)]">
         {items.map(({ to, label, Icon, enabled }) => {
-          const active = enabled && pathname === to
+          const active =
+            enabled &&
+            (to === "/"
+              ? pathname === to
+              : pathname === to || pathname.startsWith(`${to}/`))
           const cls = `flex w-14 flex-col items-center gap-0.5 ${
             enabled ? "" : "opacity-50 pointer-events-none"
           }`
